@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"os"
+	"pisondev/markdown-notes-api/exception"
 	"pisondev/markdown-notes-api/helper"
 	"pisondev/markdown-notes-api/model/domain"
 	"pisondev/markdown-notes-api/model/web"
@@ -56,7 +57,7 @@ func (s *UserServiceImpl) Register(ctx context.Context, req web.UserAuthRequest)
 	_, err = s.UserRepository.FindByUsername(ctx, tx, req.Username)
 	if err != sql.ErrNoRows {
 		s.Log.Errorf("username already exist")
-		return web.UserRegisterResponse{}, err
+		return web.UserRegisterResponse{}, exception.ErrConflictUser
 	}
 
 	user := domain.User{
