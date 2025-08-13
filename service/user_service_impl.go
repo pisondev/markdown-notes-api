@@ -104,12 +104,12 @@ func (s *UserServiceImpl) Login(ctx context.Context, req web.UserAuthRequest) (w
 	s.Log.Info("calling findbyusername repository...")
 	selectedUser, err := s.UserRepository.FindByUsername(ctx, tx, req.Username)
 	if err != nil {
-		s.Log.Errorf("failed to use find repository in service layer: %v", err)
+		s.Log.Errorf("username is not found")
 		err := tx.Rollback()
 		if err != nil {
 			s.Log.Errorf("failed to rollback tx: %v", err)
 		}
-		return web.UserLoginResponse{}, nil
+		return web.UserLoginResponse{}, exception.ErrUnauthorizedLogin
 	}
 
 	s.Log.Info("compare hashed password...")
@@ -120,7 +120,7 @@ func (s *UserServiceImpl) Login(ctx context.Context, req web.UserAuthRequest) (w
 		if err != nil {
 			return web.UserLoginResponse{}, err
 		}
-		return web.UserLoginResponse{}, err
+		return web.UserLoginResponse{}, exception.ErrUnauthorizedLogin
 	}
 
 	claims := web.CustomClaims{
@@ -134,7 +134,7 @@ func (s *UserServiceImpl) Login(ctx context.Context, req web.UserAuthRequest) (w
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	secretKey := os.Getenv("JWT_SECRET_KEY")
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		s.Log.Errorf("failed sign token: %v", err)
 		return web.UserLoginResponse{}, err
