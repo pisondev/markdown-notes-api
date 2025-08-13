@@ -4,6 +4,7 @@ import (
 	"os"
 	"pisondev/markdown-notes-api/app"
 	"pisondev/markdown-notes-api/controller"
+	"pisondev/markdown-notes-api/exception"
 	"pisondev/markdown-notes-api/repository"
 	"pisondev/markdown-notes-api/service"
 
@@ -29,7 +30,9 @@ func main() {
 	userService := service.NewUserService(userRepository, db, validate, log)
 	userController := controller.NewUserController(userService, log)
 
-	server := fiber.New()
+	server := fiber.New(fiber.Config{
+		ErrorHandler: exception.ErrorHandler,
+	})
 	log.Infof("server starting on port %s...", serverPort)
 
 	server.Post("/register", userController.Register)
