@@ -56,6 +56,8 @@ func (r *UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sql.Tx, use
 			r.Log.Errorf("failed to scan selected user: %v", err)
 			return domain.User{}, err
 		}
+		return user, nil
+	} else {
+		return domain.User{}, sql.ErrNoRows
 	}
-	return user, nil
 }
