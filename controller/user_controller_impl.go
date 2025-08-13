@@ -42,7 +42,7 @@ func (controller *UserControllerImpl) Register(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(userResponse)
+	return ctx.Status(fiber.StatusCreated).JSON(userResponse)
 }
 
 func (controller *UserControllerImpl) Login(ctx *fiber.Ctx) error {
