@@ -13,6 +13,13 @@ type UserControllerImpl struct {
 	Log         *logrus.Logger
 }
 
+func NewUserController(userService service.UserService, log *logrus.Logger) UserController {
+	return &UserControllerImpl{
+		UserService: userService,
+		Log:         log,
+	}
+}
+
 func (controller *UserControllerImpl) Register(ctx *fiber.Ctx) error {
 	controller.Log.Info("parsing request body...")
 	userAuthRequest := web.UserAuthRequest{}

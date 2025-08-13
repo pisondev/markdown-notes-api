@@ -23,6 +23,15 @@ type UserServiceImpl struct {
 	Log            *logrus.Logger
 }
 
+func NewUserService(userRepository repository.UserRepository, DB *sql.DB, validate *validator.Validate, log *logrus.Logger) UserService {
+	return &UserServiceImpl{
+		UserRepository: userRepository,
+		DB:             DB,
+		Validate:       validate,
+		Log:            log,
+	}
+}
+
 func (s *UserServiceImpl) Register(ctx context.Context, req web.UserAuthRequest) (web.UserRegisterResponse, error) {
 	s.Log.Info("validating req struct...")
 	err := s.Validate.Struct(req)

@@ -12,6 +12,12 @@ type UserRepositoryImpl struct {
 	Log *logrus.Logger
 }
 
+func NewUserRepository(log *logrus.Logger) UserRepository {
+	return &UserRepositoryImpl{
+		Log: log,
+	}
+}
+
 func (r *UserRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
 	SQL := "INSERT INTO users(username, hashed_password, created_at) VALUES (?,?,?)"
 	result, err := tx.ExecContext(ctx, SQL, user.Username, user.HashedPassword, user.CreatedAt)
