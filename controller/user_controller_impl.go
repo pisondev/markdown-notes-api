@@ -26,7 +26,13 @@ func (controller *UserControllerImpl) Register(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&userAuthRequest)
 	if err != nil {
 		controller.Log.Errorf("failed to parse body: %v", err)
-		return err
+
+		errorResponse := web.ErrorResponse{
+			Code:   fiber.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Data:   err.Error(),
+		}
+		return ctx.Status(fiber.StatusBadRequest).JSON(errorResponse)
 	}
 
 	controller.Log.Info("calling register service...")
@@ -45,7 +51,13 @@ func (controller *UserControllerImpl) Login(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&userAuthRequest)
 	if err != nil {
 		controller.Log.Errorf("failed to parse body: %v", err)
-		return err
+
+		errorResponse := web.ErrorResponse{
+			Code:   fiber.StatusBadRequest,
+			Status: "BAD REQUEST",
+			Data:   err.Error(),
+		}
+		return ctx.Status(fiber.StatusBadRequest).JSON(errorResponse)
 	}
 
 	controller.Log.Info("calling login service...")
