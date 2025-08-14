@@ -4,6 +4,6 @@ import "time"
 
 type NoteResponse struct {
 	ID               string    `json:"id"`
-	OriginalFileName string    `json:"originalFileName"`
+	OriginalFilename string    `json:"originalFileName"`
 	CreatedAt        time.Time `json:"createdAt"`
 }

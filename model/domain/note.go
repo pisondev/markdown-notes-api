@@ -4,7 +4,8 @@ import "time"
 
 type Note struct {
 	ID               string
-	OriginalFileName string
-	StoredFileName   string
+	UserID           int
+	OriginalFilename string
+	StoredFilename   string
 	CreatedAt        time.Time
 }
