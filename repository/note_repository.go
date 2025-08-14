@@ -10,4 +10,6 @@ import (
 type NoteRepository interface {
 	SaveFile(note domain.Note, file io.Reader) error
 	SaveMetadata(ctx context.Context, tx *sql.Tx, note domain.Note) (domain.Note, error)
+	FindAll(ctx context.Context, tx *sql.Tx, userID int, limit int, offset int) ([]domain.Note, error)
+	CountAll(ctx context.Context, tx *sql.Tx) (int, error)
 }
