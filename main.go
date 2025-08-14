@@ -47,6 +47,7 @@ func main() {
 	noteRoutes := server.Group("/api/notes", middleware.AuthMiddleware(log))
 
 	noteRoutes.Post("", noteController.UploadNote)
+	noteRoutes.Get("", noteController.FindAll)
 
 	err = server.Listen(serverPort)
 	if err != nil {
