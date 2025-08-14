@@ -58,3 +58,53 @@ func (r *NoteRepositoryImpl) SaveMetadata(ctx context.Context, tx *sql.Tx, note 
 	}
 	return note, nil
 }
+
+func (r *NoteRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx, userID int, limit int, offset int) ([]domain.Note, error) {
+	r.Log.Info("REPOSITORY: FindAll")
+
+	SQL := "SELECT * FROM notes WHERE user_id = ? LIMIT ? OFFSET ?"
+
+	r.Log.Info("--query context...")
+	rows, err := tx.QueryContext(ctx, SQL, userID, limit, offset)
+	if err != nil {
+		r.Log.Errorf("--failed to query context: %v", err)
+		return []domain.Note{}, err
+	}
+	defer rows.Close()
+
+	var notes []domain.Note
+
+	r.Log.Info("--scan each note...")
+	for rows.Next() {
+		note := domain.Note{}
+		err := rows.Scan(&note.ID, &note.UserID, &note.OriginalFilename, &note.StoredFilename, &note.CreatedAt)
+		if err != nil {
+			r.Log.Errorf("--failed to scan note: %v", err)
+			return []domain.Note{}, err
+		}
+		notes = append(notes, note)
+	}
+	return notes, nil
+}
+
+func (r *NoteRepositoryImpl) CountAll(ctx context.Context, tx *sql.Tx) (int, error) {
+	r.Log.Info("REPOSITORY: CountAll")
+	SQL := "SELECT COUNT(user_id) FROM notes"
+	r.Log.Info("--query context...")
+	rows, err := tx.QueryContext(ctx, SQL)
+	if err != nil {
+		r.Log.Errorf("--failed to query context...")
+		return 0, err
+	}
+	defer rows.Close()
+
+	var total int
+	r.Log.Info("--scan rows integer count...")
+	if rows.Next() {
+		rows.Scan(&total)
+		return total, nil
+	} else {
+		r.Log.Error("--failed to scan integer")
+		return total, err
+	}
+}

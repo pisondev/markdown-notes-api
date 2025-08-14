@@ -81,3 +81,53 @@ func (s *NoteServiceImpl) UploadNote(ctx context.Context, req web.NoteRequest, f
 
 	return helper.ToNoteResponse(savedMetadata), nil
 }
+
+func (s *NoteServiceImpl) FindAll(ctx context.Context, userID int, page int, limit int) (web.PaginatedNoteResponse, error) {
+	s.Log.Info("SERVICE: FindAll")
+
+	offset := (page - 1) * limit
+	s.Log.Info("--begin tx...")
+	tx, err := s.DB.Begin()
+	if err != nil {
+		s.Log.Errorf("--failed to begin tx: %v", err)
+		return web.PaginatedNoteResponse{}, err
+	}
+
+	s.Log.Info("--call FindAll repository...")
+	notes, err := s.NoteRepository.FindAll(ctx, tx, userID, limit, offset)
+	if err != nil {
+		s.Log.Errorf("--failed to use FindAll repository: %v", err)
+		errRollback := tx.Rollback()
+		if errRollback != nil {
+			s.Log.Errorf("--failed to rollback tx: %v", err)
+			return web.PaginatedNoteResponse{}, errRollback
+		}
+		return web.PaginatedNoteResponse{}, err
+	}
+
+	s.Log.Info("--call CountAll repository...")
+	total, err := s.NoteRepository.CountAll(ctx, tx)
+	if err != nil {
+		s.Log.Errorf("--failed to use CountAll repository: %v", err)
+		errRollback := tx.Rollback()
+		if errRollback != nil {
+			s.Log.Errorf("--failed to rollback tx: %v", err)
+			return web.PaginatedNoteResponse{}, errRollback
+		}
+		return web.PaginatedNoteResponse{}, err
+	}
+
+	noteResponses := helper.ToNoteResponses(notes)
+	totalPages := (total + limit - 1) / limit
+
+	pagination := web.Pagination{
+		CurrentPage: page,
+		Limit:       limit,
+		TotalItems:  total,
+		TotalPages:  totalPages,
+	}
+	return web.PaginatedNoteResponse{
+		Data:       noteResponses,
+		Pagination: pagination,
+	}, nil
+}

@@ -55,3 +55,20 @@ func (controller *NoteControllerImpl) UploadNote(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(noteResponse)
 }
+
+func (controller *NoteControllerImpl) FindAll(ctx *fiber.Ctx) error {
+	controller.Log.Info("CONTROLLER: FindAll")
+	page := ctx.QueryInt("page", 1)
+	limit := ctx.QueryInt("limit", 5)
+
+	userIDInterface := ctx.Locals("userID")
+	userID := userIDInterface.(int)
+
+	controller.Log.Info("--call FindAll service...")
+	paginatedNoteResponse, err := controller.NoteService.FindAll(ctx.Context(), userID, page, limit)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(paginatedNoteResponse)
+}
