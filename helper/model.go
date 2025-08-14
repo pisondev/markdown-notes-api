@@ -19,3 +19,11 @@ func ToNoteResponse(note domain.Note) web.NoteResponse {
 		CreatedAt:        note.CreatedAt,
 	}
 }
+
+func ToNoteResponses(notes []domain.Note) []web.NoteResponse {
+	var noteResponses []web.NoteResponse
+	for _, note := range notes {
+		noteResponses = append(noteResponses, ToNoteResponse(note))
+	}
+	return noteResponses
+}
