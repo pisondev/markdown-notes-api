@@ -11,3 +11,11 @@ func ToUserRegisterResponse(user domain.User) web.UserRegisterResponse {
 		Username: user.Username,
 	}
 }
+
+func ToNoteResponse(note domain.Note) web.NoteResponse {
+	return web.NoteResponse{
+		ID:               note.ID,
+		OriginalFilename: note.OriginalFilename,
+		CreatedAt:        note.CreatedAt,
+	}
+}
